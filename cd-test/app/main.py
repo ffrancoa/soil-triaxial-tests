@@ -6,9 +6,11 @@ import os
 import plotly.graph_objects as go
 from sklearn.linear_model import LinearRegression
 
+path = os.path.dirname(__file__)
+
 st.set_page_config(
     page_title="Ensayos Triaxiales",
-    page_icon="../../utils/logo.png",
+    page_icon=path + "../../utils/logo.png",
     initial_sidebar_state="collapsed",
 )
 
@@ -40,9 +42,7 @@ with st.sidebar:
 
     st.write("")
 
-    path = os.path.dirname(__file__)
-
-    with open(path + "/example_data.zip", "rb") as example_data:
+    with open(path + "../data/example_data.zip", "rb") as example_data:
         st.download_button(
             label="¡Descargar data de ejemplo!",
             data=example_data,
