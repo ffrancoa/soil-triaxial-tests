@@ -14,9 +14,16 @@ st.set_page_config(
     initial_sidebar_state="collapsed",
 )
 
+st.markdown(
+    """<link rel="preconnect" href="https://fonts.googleapis.com">
+       <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+       <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono&display=swap" rel="stylesheet">""",
+    unsafe_allow_html=True,
+)
+
 
 def txcascadia(text, key="p", color="#2E3440"):
-    text = '<{0} style="font-family:Cascadia Code;color:{1};">{2}</{3}>'.format(
+    text = """<{0} style="font-family: 'JetBrains Mono', monospace;color:{1};">{2}</{3}>""".format(
         key, color, text, key
     )
     st.markdown(text, unsafe_allow_html=True)
@@ -63,7 +70,6 @@ with st.sidebar:
 ##############
 
 txcascadia("🔬 Ensayo Triaxial Consolidado Drenado", "h1")
-st.markdown("---")
 
 ############################################
 # Primer bloque: Datos de Espécimen Típico #
