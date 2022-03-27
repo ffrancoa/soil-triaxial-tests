@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
+import os
 
 import plotly.graph_objects as go
 from sklearn.linear_model import LinearRegression
@@ -39,7 +40,9 @@ with st.sidebar:
 
     st.write("")
 
-    with open("example_data.zip", "rb") as example_data:
+    path = os.path.dirname(__file__)
+
+    with open(path + "/example_data.zip", "rb") as example_data:
         st.download_button(
             label="¡Descargar data de ejemplo!",
             data=example_data,
