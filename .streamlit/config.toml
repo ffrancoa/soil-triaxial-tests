@@ -3,6 +3,8 @@ maxUploadSize = 1
 
 [theme]
 
+base="light"
+
 # Primary accent for interactive elements
 primaryColor = '#5E81AC'
 
