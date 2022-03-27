@@ -24,7 +24,7 @@ def txcascadia(text, key="p", color="#2E3440"):
 
 @st.cache(allow_output_mutation=True)
 def leer_registro(file):
-    df = pd.read_csv(file, encoding="utf-8", names=["d (mm)", "ΔP (kN)", "ΔV (mm³)"])
+    df = pd.read_csv(file, encoding="utf-8", names=["d (mm)", "ΔP", "ΔV (cm³)"])
 
     return df
 
@@ -38,7 +38,12 @@ with st.sidebar:
 
     txcascadia("Configuración ⚙️", "h2")
 
-    unidad = st.select_slider("Unidades de Esfuerzo 📐", ("kPa", "kg/cm²"))
+    unit = st.select_slider("Unidad de Esfuerzo 📐", ("kPa", "kg/cm²"))
+
+    if unit == "kPa":
+        unit2 = "kN"
+    else:
+        unit2 = "kg"
 
     st.write("")
 
@@ -133,8 +138,8 @@ with st.form("formensayo1"):
             verf_archivo1 = False
 
     esf = st.number_input(
-        "Esfuerzo de confinamiento ({})".format(unidad),
-        step=100.0 if unidad == "kPa" else 1.0,
+        "Esfuerzo de confinamiento ({})".format(unit),
+        step=100.0 if unit == "kPa" else 1.0,
         min_value=0.0,
         key="esf1",
         help="Esfuerzo isotrópico final de la etapa de consolidación.",
@@ -203,8 +208,8 @@ with st.form("formensayo2"):
             verf_archivo2 = False
 
     esf = st.number_input(
-        "Esfuerzo de confinamiento ({})".format(unidad),
-        step=100.0 if unidad == "kPa" else 1.0,
+        "Esfuerzo de confinamiento ({})".format(unit),
+        step=100.0 if unit == "kPa" else 1.0,
         min_value=0.0,
         key="esf2",
         help="Esfuerzo isotrópico final de la etapa de consolidación.",
@@ -272,8 +277,8 @@ with st.form("formensayo3"):
             verf_archivo3 = False
 
     esf = st.number_input(
-        "Esfuerzo de confinamiento ({})".format(unidad),
-        step=100.0 if unidad == "kPa" else 1.0,
+        "Esfuerzo de confinamiento ({})".format(unit),
+        step=100.0 if unit == "kPa" else 1.0,
         min_value=0.0,
         key="esf3",
         help="Esfuerzo isotrópico final de la etapa de consolidación.",
@@ -401,7 +406,7 @@ if all(st.session_state.archivos):
             fig.add_trace(
                 go.Scatter(
                     x=ensayo["d (mm)"],
-                    y=ensayo["ΔP (kN)"],
+                    y=ensayo["ΔP"],
                     name="Ensayo #{}".format(j + 1),
                     line=dict(color=colores[j + 1]),
                     text="σ₀ = {}".format(st.session_state.esf_conf[j]),
@@ -444,7 +449,7 @@ if all(st.session_state.archivos):
         )
 
         fig.update_yaxes(
-            title_text="Fuerza Axial, ΔP (kN)",
+            title_text="Fuerza Axial, ΔP",
             tickfont_size=13,
             fixedrange=True,
             showgrid=True,
@@ -462,7 +467,7 @@ if all(st.session_state.archivos):
             fig.add_trace(
                 go.Scatter(
                     x=ensayo["d (mm)"],
-                    y=ensayo["ΔV (mm³)"],
+                    y=ensayo["ΔV (cm³)"],
                     name="Ensayo #{}".format(j + 1),
                     line=dict(color=colores[j + 1]),
                     text="σ₀ = {}".format(st.session_state.esf_conf[j]),
@@ -484,7 +489,7 @@ if all(st.session_state.archivos):
         )
 
         fig.update_yaxes(
-            title_text="Variación Volumétrica, ΔV (mm³)",
+            title_text="Variación Volumétrica, ΔV (cm³)",
             tickfont_size=13,
             fixedrange=True,
             showgrid=True,
@@ -512,7 +517,7 @@ if all(st.session_state.archivos):
 
     st.plotly_chart(fig, config={"displayModeBar": False})
 else:
-    "⌛ Esperando resultados de laboratorio..."
+    "⌛ Esperando registros de laboratorio..."
 
 
 ############################################
@@ -530,11 +535,11 @@ if all(st.session_state.archivos):
 
     for i, ensayo in enumerate(st.session_state.ensayos):
         ensayo["ε (%)"] = ensayo["d (mm)"] / hf[i] * 10
-        ensayo["ΔV (%)"] = (ensayo["ΔV (mm³)"] - ensayo["ΔV (mm³)"][0]) / vf[i] * 100
-        ensayo["Ac (cm²)"] = (vf[i] - ensayo["ΔV (mm³)"]) / (
+        ensayo["ΔV (%)"] = (ensayo["ΔV (cm³)"] - ensayo["ΔV (cm³)"][0]) / vf[i] * 100
+        ensayo["Ac (cm²)"] = (vf[i] - ensayo["ΔV (cm³)"]) / (
             hf[i] - ensayo["d (mm)"] / 10
         )
-        ensayo["Δσ (kPa)"] = ensayo["ΔP (kN)"] / ensayo["Ac (cm²)"] * 10**4
+        ensayo["Δσ ({0})".format(unit)] = ensayo["ΔP"] / ensayo["Ac (cm²)"] * 10**4
 
     txcascadia("🏴 Geometría | Consolidación", "h3", "#434C5E")
 
@@ -635,7 +640,7 @@ if all(st.session_state.archivos):
             fig2.add_trace(
                 go.Scatter(
                     x=ensayo["ε (%)"],
-                    y=ensayo["Δσ (kPa)"],
+                    y=ensayo["Δσ ({0})".format(unit)],
                     name="Ensayo #{}".format(j + 1),
                     line=dict(color=colores[j + 1]),
                     text="σ₀ = {}".format(st.session_state.esf_conf[j]),
@@ -678,7 +683,7 @@ if all(st.session_state.archivos):
         )
 
         fig2.update_yaxes(
-            title_text="Esfuerzo Desviador, Δσ (kPa)",
+            title_text="Esfuerzo Desviador, Δσ ({0})".format(unit),
             tickfont_size=13,
             fixedrange=True,
             showgrid=True,
@@ -748,7 +753,7 @@ if all(st.session_state.archivos):
 
 
 else:
-    "⌛ Esperando resultados de laboratorio..."
+    "⌛ Esperando registros de laboratorio..."
 
 #############################################
 # Quinto bloque: Procesamiento y Resultados #
@@ -770,23 +775,29 @@ if all(st.session_state.archivos):
 
     if convencion == "University of Cambridge":
         for i, ensayo in enumerate(st.session_state.ensayos):
-            ensayo["p' (kPa)"] = st.session_state.esf_conf[i] + ensayo["Δσ (kPa)"] / 3
-            ensayo["q (kPa)"] = ensayo["Δσ (kPa)"]
+            ensayo["p' ({0}})".format(unit)] = (
+                st.session_state.esf_conf[i] + ensayo["Δσ ({0}})".format(unit)] / 3
+            )
+            ensayo["q ({0}})".format(unit)] = ensayo["Δσ ({0}})".format(unit)]
 
-            ensayo["p' [M.I.T]"] = st.session_state.esf_conf[i] + ensayo["Δσ (kPa)"] / 2
-            ensayo["q [M.I.T]"] = ensayo["Δσ (kPa)"] / 2
+            ensayo["p' [M.I.T]"] = (
+                st.session_state.esf_conf[i] + ensayo["Δσ ({0}})".format(unit)] / 2
+            )
+            ensayo["q [M.I.T]"] = ensayo["Δσ ({0}})".format(unit)] / 2
     else:
         for i, ensayo in enumerate(st.session_state.ensayos):
-            ensayo["p' (kPa)"] = st.session_state.esf_conf[i] + ensayo["Δσ (kPa)"] / 2
-            ensayo["q (kPa)"] = ensayo["Δσ (kPa)"] / 2
+            ensayo["p' ({0})".format(unit)] = (
+                st.session_state.esf_conf[i] + ensayo["Δσ ({0})".format(unit)] / 2
+            )
+            ensayo["q ({0})".format(unit)] = ensayo["Δσ ({0})".format(unit)] / 2
 
     fig3 = go.Figure()
 
     for i, ensayo in enumerate(st.session_state.ensayos):
         fig3.add_trace(
             go.Scatter(
-                x=ensayo["p' (kPa)"],
-                y=ensayo["q (kPa)"],
+                x=ensayo["p' ({0})".format(unit)],
+                y=ensayo["q ({0})".format(unit)],
                 name="Ensayo #{}".format(i + 1),
                 line=dict(color=colores[i + 1]),
                 text="σ₀ = {}".format(st.session_state.esf_conf[i]),
@@ -794,8 +805,8 @@ if all(st.session_state.archivos):
         )
         fig3.add_trace(
             go.Scatter(
-                x=np.array(ensayo["p' (kPa)"].iloc[-1]),
-                y=np.array(ensayo["q (kPa)"].iloc[-1]),
+                x=np.array(ensayo["p' ({0})".format(unit)].iloc[-1]),
+                y=np.array(ensayo["q ({0})".format(unit)].iloc[-1]),
                 name="Ensayo #{}".format(i + 1),
                 marker_size=7,
                 marker_color=colores[i + 1],
@@ -815,10 +826,10 @@ if all(st.session_state.archivos):
         modelo_MIT.fit(p_falla_MIT, q_falla_MIT)
 
     p_falla = np.array(
-        [ensayo["p' (kPa)"].iloc[-1] for ensayo in st.session_state.ensayos]
+        [ensayo["p' ({0})".format(unit)].iloc[-1] for ensayo in st.session_state.ensayos]
     ).reshape(-1, 1)
     q_falla = np.array(
-        [ensayo["q (kPa)"].iloc[-1] for ensayo in st.session_state.ensayos]
+        [ensayo["q ({0})".format(unit)].iloc[-1] for ensayo in st.session_state.ensayos]
     )
 
     modelo = LinearRegression()
@@ -857,7 +868,7 @@ if all(st.session_state.archivos):
     )
 
     fig3.update_xaxes(
-        title_text="p' (kPa)",
+        title_text="p' ({0})".format(unit),
         tickfont_size=13,
         fixedrange=True,
         showgrid=True,
@@ -871,7 +882,7 @@ if all(st.session_state.archivos):
     )
 
     fig3.update_yaxes(
-        title_text="q (kPa)",
+        title_text="q ({0})".format(unit),
         tickfont_size=13,
         fixedrange=True,
         showgrid=True,
@@ -952,7 +963,7 @@ if all(st.session_state.archivos):
     )
 
     fig4.update_xaxes(
-        title_text="σ' (kPa)",
+        title_text="σ' ({0})".format(unit),
         tickfont_size=13,
         showgrid=True,
         gridwidth=1,
@@ -966,7 +977,7 @@ if all(st.session_state.archivos):
 
     fig4.update_yaxes(
         range=rango_q1,
-        title_text="τ (kPa)",
+        title_text="τ ({0})".format(unit),
         tickfont_size=13,
         showgrid=True,
         gridwidth=1,
@@ -1017,15 +1028,15 @@ if all(st.session_state.archivos):
     resultados = pd.DataFrame(
         {
             "Ensayos": ["Ensayo #1", "Ensayo #2", "Ensayo #3"],
-            "σ3 ({0})".format(unidad): [
+            "σ3 ({0})".format(unit): [
                 st.session_state["esf_conf"][0],
                 st.session_state["esf_conf"][1],
                 st.session_state["esf_conf"][2],
             ],
-            "Δσf ({0})".format(unidad): [
-                max(st.session_state.ensayos[0]["Δσ (kPa)"]),
-                max(st.session_state.ensayos[1]["Δσ (kPa)"]),
-                max(st.session_state.ensayos[2]["Δσ (kPa)"]),
+            "Δσf ({0})".format(unit): [
+                max(st.session_state.ensayos[0]["Δσ ({0})".format(unit)]),
+                max(st.session_state.ensayos[1]["Δσ ({0})".format(unit)]),
+                max(st.session_state.ensayos[2]["Δσ ({0})".format(unit)]),
             ],
         }
     )
@@ -1067,4 +1078,4 @@ if all(st.session_state.archivos):
     st.plotly_chart(fig5, use_container_width=True, config={"displayModeBar": False})
 
 else:
-    st.write("⌛ Esperando resultados de laboratorio...")
+    st.write("⌛ Esperando registros de laboratorio...")
