@@ -7,7 +7,7 @@ from sklearn.linear_model import LinearRegression
 
 st.set_page_config(
     page_title="Ensayos Triaxiales",
-    page_icon="logo.ico",
+    page_icon="../../utils/logo.png",
     initial_sidebar_state="collapsed",
 )
 
@@ -36,6 +36,15 @@ with st.sidebar:
     txcascadia("Configuración ⚙️", "h2")
 
     unidad = st.select_slider("Unidades de Esfuerzo 📐", ("kPa", "kg/cm²"))
+
+    st.write("")
+
+    with open("../data/example_data.zip", "rb") as example_data:
+        st.download_button(
+            label="¡Descargar data de ejemplo!",
+            data=example_data,
+            mime="application/zip",
+        )
 
 
 ##############
