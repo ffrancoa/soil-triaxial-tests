@@ -46,7 +46,7 @@ with st.sidebar:
 
     with open(examples_path, "rb") as example_data:
         st.download_button(
-            label="¡Descargar data de ejemplo!",
+            label="📄 ¡Descargar data de ejemplo!",
             data=example_data,
             file_name="example_data.zip",
             mime="application/zip",
