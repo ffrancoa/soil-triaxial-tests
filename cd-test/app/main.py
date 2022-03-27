@@ -39,7 +39,7 @@ with st.sidebar:
 
     st.write("")
 
-    with open("../data/example_data.zip", "rb") as example_data:
+    with open("example_data.zip", "rb") as example_data:
         st.download_button(
             label="¡Descargar data de ejemplo!",
             data=example_data,
