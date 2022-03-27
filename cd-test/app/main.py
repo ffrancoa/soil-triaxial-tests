@@ -31,7 +31,7 @@ def txcascadia(text, key="p", color="#2E3440"):
 
 @st.cache(allow_output_mutation=True)
 def leer_registro(file):
-    df = pd.read_csv(file, encoding="utf-8", names=["d (mm)", "ΔP", "ΔV (cm³)"])
+    df = pd.read_csv(file, encoding="utf-8", names=["d (mm)", "ΔP", "Vb (cm³)"])
 
     return df
 
@@ -129,8 +129,6 @@ with st.form("formensayo1"):
             format="%.3f",
             step=0.001,
         )
-        if not h_cons[0]:
-            verf_archivo1 = False
 
     with col2:
 
@@ -140,8 +138,6 @@ with st.form("formensayo1"):
             key="v1",
             help="Volumen total desplazado en la etapa de consolidación.",
         )
-        if not v_cons[0]:
-            verf_archivo1 = False
 
     esf = st.number_input(
         "Esfuerzo de confinamiento ({})".format(unit),
@@ -199,8 +195,6 @@ with st.form("formensayo2"):
             format="%.3f",
             step=0.001,
         )
-        if not h_cons[1]:
-            verf_archivo2 = False
 
     with col2:
 
@@ -210,9 +204,6 @@ with st.form("formensayo2"):
             key="v2",
             help="Volumen total desplazado en la etapa de consolidación.",
         )
-        if not v_cons[1]:
-            verf_archivo2 = False
-
     esf = st.number_input(
         "Esfuerzo de confinamiento ({})".format(unit),
         step=100.0 if unit == "kPa" else 1.0,
@@ -268,8 +259,6 @@ with st.form("formensayo3"):
             format="%.3f",
             step=0.001,
         )
-        if not h_cons[2]:
-            verf_archivo3 = False
 
     with col2:
 
@@ -279,8 +268,6 @@ with st.form("formensayo3"):
             key="v3",
             help="Volumen total desplazado en la etapa de consolidación.",
         )
-        if not v_cons[2]:
-            verf_archivo3 = False
 
     esf = st.number_input(
         "Esfuerzo de confinamiento ({})".format(unit),
@@ -392,7 +379,7 @@ if all(st.session_state.archivos):
         "Seleccione uno de los gráficos obtenidos en laboratorio.",
         (
             "Deformación Axial [d] - Fuerza Axial [ΔP]",
-            "Deformación Axial [d] - Var. Volumétrica [ΔV]",
+            "Deformación Axial [d] - Volumen de Buretas [Vb]",
         ),
     )
 
@@ -473,7 +460,7 @@ if all(st.session_state.archivos):
             fig.add_trace(
                 go.Scatter(
                     x=ensayo["d (mm)"],
-                    y=ensayo["ΔV (cm³)"],
+                    y=ensayo["Vb (cm³)"],
                     name="Ensayo #{}".format(j + 1),
                     line=dict(color=colores[j + 1]),
                     text="σ₀ = {}".format(st.session_state.esf_conf[j]),
@@ -495,7 +482,7 @@ if all(st.session_state.archivos):
         )
 
         fig.update_yaxes(
-            title_text="Variación Volumétrica, ΔV (cm³)",
+            title_text="Volumen de Buretas, Vb (cm³)",
             tickfont_size=13,
             fixedrange=True,
             showgrid=True,
@@ -541,8 +528,8 @@ if all(st.session_state.archivos):
 
     for i, ensayo in enumerate(st.session_state.ensayos):
         ensayo["ε (%)"] = ensayo["d (mm)"] / hf[i] * 10
-        ensayo["ΔV (%)"] = (ensayo["ΔV (cm³)"] - ensayo["ΔV (cm³)"][0]) / vf[i] * 100
-        ensayo["Ac (cm²)"] = (vf[i] - ensayo["ΔV (cm³)"]) / (
+        ensayo["ΔV (%)"] = (ensayo["Vb (cm³)"][0] - ensayo["Vb (cm³)"]) / vf[i] * 100
+        ensayo["Ac (cm²)"] = (vf[i] - ensayo["Vb (cm³)"]) / (
             hf[i] - ensayo["d (mm)"] / 10
         )
         ensayo["Δσ ({0})".format(unit)] = ensayo["ΔP"] / ensayo["Ac (cm²)"] * 10**4
