@@ -775,15 +775,15 @@ if all(st.session_state.archivos):
 
     if convencion == "University of Cambridge":
         for i, ensayo in enumerate(st.session_state.ensayos):
-            ensayo["p' ({0}})".format(unit)] = (
-                st.session_state.esf_conf[i] + ensayo["Δσ ({0}})".format(unit)] / 3
+            ensayo["p' ({0})".format(unit)] = (
+                st.session_state.esf_conf[i] + ensayo["Δσ ({0})".format(unit)] / 3
             )
-            ensayo["q ({0}})".format(unit)] = ensayo["Δσ ({0}})".format(unit)]
+            ensayo["q ({0})".format(unit)] = ensayo["Δσ ({0})".format(unit)]
 
             ensayo["p' [M.I.T]"] = (
-                st.session_state.esf_conf[i] + ensayo["Δσ ({0}})".format(unit)] / 2
+                st.session_state.esf_conf[i] + ensayo["Δσ ({0})".format(unit)] / 2
             )
-            ensayo["q [M.I.T]"] = ensayo["Δσ ({0}})".format(unit)] / 2
+            ensayo["q [M.I.T]"] = ensayo["Δσ ({0})".format(unit)] / 2
     else:
         for i, ensayo in enumerate(st.session_state.ensayos):
             ensayo["p' ({0})".format(unit)] = (
