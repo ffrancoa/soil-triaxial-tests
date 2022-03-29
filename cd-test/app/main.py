@@ -6,6 +6,12 @@ import os
 import plotly.graph_objects as go
 from sklearn.linear_model import LinearRegression
 
+CUSTOM_FONT = "JetBrains Mono"
+
+CUSTOM_FONT_URL = """<link rel="preconnect" href="https://fonts.googleapis.com">
+                     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+                     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono&display=block" rel="stylesheet">"""
+
 ROOT_DIR = os.path.realpath(os.path.join(os.path.dirname(__file__), "..", ".."))
 
 st.set_page_config(
@@ -14,17 +20,12 @@ st.set_page_config(
     initial_sidebar_state="collapsed",
 )
 
-st.markdown(
-    """<link rel="preconnect" href="https://fonts.googleapis.com">
-       <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-       <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono&display=swap" rel="stylesheet">""",
-    unsafe_allow_html=True,
-)
+st.markdown(CUSTOM_FONT_URL, unsafe_allow_html=True)
 
 
-def google_text(text, key="p", color="#2E3440"):
-    text = """<{0} style="font-family: 'JetBrains Mono', monospace;color:{1};">{2}</{3}>""".format(
-        key, color, text, key
+def googlef_text(text, font=CUSTOM_FONT, key="p", color="#2E3440"):
+    text = """<{0} style="font-family: '{1}', monospace;color:{2};">{3}</{4}>""".format(
+        key, font, color, text, key
     )
     st.markdown(text, unsafe_allow_html=True)
 
@@ -36,14 +37,16 @@ def _read_csv(file):
     return df
 
 
+# TODO: Remover la fuenteCUSTOM_FONT ya que esta no la intepretan otros navegadores además del mío
+
 ###########
 # Sidebar #
 ###########
 
 with st.sidebar:
-    google_text("Soil Triaxial Tests", "h1")
+    googlef_text("Soil Triaxial Tests", key="h1")
 
-    google_text("Settings ⚙️", "h2")
+    googlef_text("Settings ⚙️", key="h2")
 
     unit = st.select_slider("Stress Units 📐", ("kPa", "kg/cm²"))
 
@@ -69,27 +72,27 @@ with st.sidebar:
 # Encabezado #
 ##############
 
-google_text("Consolidated Drained Triaxial Test", "h1")
+googlef_text("Consolidated Drained Triaxial Test", key="h1")
 
 ############################################
 # Primer bloque: Datos de Espécimen Típico #
 ############################################
 
-google_text("1️⃣ Datos de Espécimen Típico", "h2")
+googlef_text("1️⃣ Tipical Specimen Parameters", key="h2")
 
-google_text("🏳️ Geometría | Remoldeo", "h3", "#434C5E")
+googlef_text("🏳️ Geometry | Preparation", key="h3", color="#434C5E")
 
 col11, col12, col13 = st.columns([1.0, 1.0, 1.1])
 
 with col11:
-    h = st.number_input("Altura inicial (cm)", min_value=0.0, value=20.0, step=1.0)
+    h = st.number_input("Initial height (cm)", min_value=0.0, value=20.0, step=1.0)
 
 with col12:
-    D = st.number_input("Diámetro (cm)", min_value=0.0, value=10.0, step=1.0)
+    D = st.number_input("Diameter (cm)", min_value=0.0, value=10.0, step=1.0)
 
 with col13:
     V = st.number_input(
-        "Volumen inicial (cm³)",
+        "Initial volume (cm³)",
         value=(3.1416 * D**2) / 4 * h,
         help="Volumen calculado a partir de las dimensiones iniciales del espécimen.",
         disabled=True,
@@ -99,7 +102,7 @@ with col13:
 # Segundo bloque: Lectura de Datos de Laboratorio #
 ###################################################
 
-google_text("2️⃣ Registros de Laboratorio", "h2")
+googlef_text("2️⃣ Registros de Laboratorio", key="h2")
 
 if "files" not in st.session_state:
     st.session_state["files"] = [None] * 3
@@ -112,7 +115,7 @@ h_cons = [None] * 3
 v_cons = [None] * 3
 
 
-google_text("✔️ Ensayo #1", "h3", "#434C5E")
+googlef_text("✔️ Ensayo #1", key="h3", color="#434C5E")
 
 with st.form("formensayo1"):
 
@@ -178,7 +181,7 @@ else:
     st.error("❌ Datos incompletos y/o registro inválido.")
 
 
-google_text("✔️ Ensayo #2", "h3", "#434C5E")
+googlef_text("✔️ Ensayo #2", key="h3", color="#434C5E")
 
 with st.form("formensayo2"):
 
@@ -242,7 +245,7 @@ elif (
 else:
     st.error("❌ Datos incompletos y/o registro inválido.")
 
-google_text("✔️ Ensayo #3", "h3", "#434C5E")
+googlef_text("✔️ Ensayo #3", key="h3", color="#434C5E")
 
 with st.form("formensayo3"):
 
@@ -316,13 +319,13 @@ if all(st.session_state.files):
 # Tercer Bloque: Resultados de Laboratorio #
 ############################################
 
-google_text("3️⃣ Resultados de Laboratorio", "h2")
+googlef_text("3️⃣ Resultados de Laboratorio", key="h2")
 
 # Visualización de Registros #
 ##############################
 
 if all(st.session_state.files):
-    google_text("📋 Visualización de Registros", "h3", "#434C5E")
+    googlef_text("📋 Visualización de Registros", key="h3", color="#434C5E")
 
     lab_table = st.selectbox(
         "Seleccione uno de los registros de laboratorio.",
@@ -342,7 +345,7 @@ if all(st.session_state.files):
             go.Table(
                 header=dict(
                     values=list(tabla.columns),
-                    font_family="Cascadia Code",
+                    font_family=CUSTOM_FONT,
                     font_size=13,
                     font_color="#ECEFF4",
                     fill_color="#5E81AC",
@@ -351,7 +354,7 @@ if all(st.session_state.files):
                 ),
                 cells=dict(
                     values=[tabla.iloc[:, 0], tabla.iloc[:, 1], tabla.iloc[:, 2]],
-                    font_family="Cascadia Code",
+                    font_family=CUSTOM_FONT,
                     font_size=13,
                     fill_color="#E5E9F0",
                     align="center",
@@ -373,7 +376,7 @@ if all(st.session_state.files):
 ###########################
 
 if all(st.session_state.files):
-    google_text("📊 Gráficas de Laboratorio", "h3", "#434C5E")
+    googlef_text("📊 Gráficas de Laboratorio", key="h3", color="#434C5E")
 
     graflabo_escogido = st.selectbox(
         "Seleccione uno de los gráficos obtenidos en laboratorio.",
@@ -497,14 +500,14 @@ if all(st.session_state.files):
 
     fig.update_layout(
         dragmode="pan",
-        font=dict(family="Cascadia Code", color="#5E81AC"),
+        font=dict(family=CUSTOM_FONT, color="#5E81AC"),
         showlegend=False,
         template="seaborn",
         paper_bgcolor="#ECEFF4",
         plot_bgcolor="#E5E9F0",
         margin=dict(l=0, r=0, b=0, t=0),
         hoverlabel=dict(
-            font_family="Cascadia Code",
+            font_family=CUSTOM_FONT,
         ),
     )
 
@@ -517,7 +520,7 @@ else:
 # Cuarto bloque: Preprocesamiento de Datos #
 ############################################
 
-google_text("4️⃣ Preprocesamiento de Datos", "h2")
+googlef_text("4️⃣ Preprocesamiento de Datos", key="h2")
 
 if all(st.session_state.files):
     hf = [h - hc / 10 for hc in h_cons]
@@ -534,7 +537,7 @@ if all(st.session_state.files):
         )
         ensayo["Δσ ({0})".format(unit)] = ensayo["ΔP"] / ensayo["Ac (cm²)"] * 10**4
 
-    google_text("🏴 Geometría | Consolidación", "h3", "#434C5E")
+    googlef_text("🏴 Geometry | Consolidation", key="h3", color="#434C5E")
 
     tabla_preprocs = st.selectbox(
         "Seleccione uno de los registros de laboratorio.",
@@ -561,7 +564,7 @@ if all(st.session_state.files):
             disabled=True,
         )
 
-    google_text("📋 Resultados del Preprocesamiento", "h3", "#434C5E")
+    googlef_text("📋 Resultados del Preprocesamiento", key="h3", color="#434C5E")
 
     tables = {
         "Ensayo #1": st.session_state.tests[0].iloc[:, [3, 4, 5, 6]],
@@ -575,7 +578,7 @@ if all(st.session_state.files):
             go.Table(
                 header=dict(
                     values=list(tabla.columns),
-                    font_family="Cascadia Code",
+                    font_family=CUSTOM_FONT,
                     font_size=13,
                     font_color="#ECEFF4",
                     fill_color="#4C566A",
@@ -589,7 +592,7 @@ if all(st.session_state.files):
                         tabla.iloc[:, 2],
                         tabla.iloc[:, 3],
                     ],
-                    font_family="Cascadia Code",
+                    font_family=CUSTOM_FONT,
                     font_size=13,
                     fill_color="#E5E9F0",
                     align="center",
@@ -610,7 +613,7 @@ if all(st.session_state.files):
     # Curvas del Preprocesamiento #
     ###############################
 
-    google_text("📊 Curvas del Preprocesamiento", "h3", "#434C5E")
+    googlef_text("📊 Curvas del Preprocesamiento", key="h3", color="#434C5E")
 
     grafpreprosc_escogido = st.selectbox(
         "Seleccione uno de los gráficos obtenidos del preprocesamiento.",
@@ -731,14 +734,14 @@ if all(st.session_state.files):
 
     fig2.update_layout(
         dragmode="pan",
-        font=dict(family="Cascadia Code", color="#5E81AC"),
+        font=dict(family=CUSTOM_FONT, color="#5E81AC"),
         showlegend=False,
         template="seaborn",
         paper_bgcolor="#ECEFF4",
         plot_bgcolor="#E5E9F0",
         margin=dict(l=0, r=0, b=0, t=0),
         hoverlabel=dict(
-            font_family="Cascadia Code",
+            font_family=CUSTOM_FONT,
         ),
     )
 
@@ -752,14 +755,14 @@ else:
 # Quinto bloque: Procesamiento y Resultados #
 #############################################
 
-google_text("5️⃣ Procesamiento y Resultados", "h2")
+googlef_text("5️⃣ Procesamiento y Resultados", key="h2")
 
 if all(st.session_state.files):
 
     # Trayectorias de Esfuerzos #
     #############################
 
-    google_text("📈 Trayectorias de Esfuerzos", "h3", "#434C5E")
+    googlef_text("📈 Trayectorias de Esfuerzos", key="h3", color="#434C5E")
 
     convencion = st.radio(
         "Escoga una convención para el cálculo de las invariantes de esfuerzos.",
@@ -890,13 +893,13 @@ if all(st.session_state.files):
 
     fig3.update_layout(
         dragmode="pan",
-        font=dict(family="Cascadia Code", color="#5E81AC"),
+        font=dict(family=CUSTOM_FONT, color="#5E81AC"),
         showlegend=False,
         template="seaborn",
         paper_bgcolor="#ECEFF4",
         plot_bgcolor="#E5E9F0",
         margin=dict(l=0, r=0, b=0, t=0),
-        hoverlabel=dict(font_family="Cascadia Code"),
+        hoverlabel=dict(font_family=CUSTOM_FONT),
     )
 
     st.write("")
@@ -905,7 +908,7 @@ if all(st.session_state.files):
     # Círculos de Mohr #
     ####################
 
-    google_text("📉 Círculos de Mohr", "h3", "#434C5E")
+    googlef_text("📉 Círculos de Mohr", key="h3", color="#434C5E")
 
     if convencion == "University of Cambridge":
         phi = float(np.degrees(np.arcsin(modelo_MIT.coef_)))
@@ -1001,13 +1004,13 @@ if all(st.session_state.files):
 
     fig4.update_layout(
         dragmode="pan",
-        font=dict(family="Cascadia Code", color="#5E81AC"),
+        font=dict(family=CUSTOM_FONT, color="#5E81AC"),
         showlegend=False,
         template="seaborn",
         paper_bgcolor="#ECEFF4",
         plot_bgcolor="#E5E9F0",
         margin=dict(l=0, r=0, b=0, t=0),
-        hoverlabel=dict(font_family="Cascadia Code"),
+        hoverlabel=dict(font_family=CUSTOM_FONT),
     )
 
     st.write("")
@@ -1016,7 +1019,7 @@ if all(st.session_state.files):
     # Resumen de Resultados #
     ########################
 
-    google_text("🎈 Resumen de Resultados", "h3", "#434C5E")
+    googlef_text("🎈 Resumen de Resultados", key="h3", color="#434C5E")
 
     resultados = pd.DataFrame(
         {
@@ -1039,7 +1042,7 @@ if all(st.session_state.files):
             go.Table(
                 header=dict(
                     values=list(resultados.columns),
-                    font_family="Cascadia Code",
+                    font_family=CUSTOM_FONT,
                     font_size=13,
                     font_color="#ECEFF4",
                     fill_color=["#4C566A", "#81A1C1", "#81A1C1"],
@@ -1052,7 +1055,7 @@ if all(st.session_state.files):
                         resultados.iloc[:, 1],
                         resultados.iloc[:, 2],
                     ],
-                    font_family="Cascadia Code",
+                    font_family=CUSTOM_FONT,
                     font_size=13,
                     fill_color=["#D8DEE9", "#E5E9F0", "#E5E9F0"],
                     align="center",
