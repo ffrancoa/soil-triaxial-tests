@@ -9,7 +9,7 @@ from sklearn.linear_model import LinearRegression
 ROOT_DIR = os.path.realpath(os.path.join(os.path.dirname(__file__), "..", ".."))
 
 st.set_page_config(
-    page_title="Ensayos Triaxiales",
+    page_title="Soil Triaxial Tests",
     page_icon=os.path.join(ROOT_DIR, "utils", "logo.png"),
     initial_sidebar_state="collapsed",
 )
@@ -22,7 +22,7 @@ st.markdown(
 )
 
 
-def txcascadia(text, key="p", color="#2E3440"):
+def google_text(text, key="p", color="#2E3440"):
     text = """<{0} style="font-family: 'JetBrains Mono', monospace;color:{1};">{2}</{3}>""".format(
         key, color, text, key
     )
@@ -30,7 +30,7 @@ def txcascadia(text, key="p", color="#2E3440"):
 
 
 @st.cache(allow_output_mutation=True)
-def leer_registro(file):
+def _read_csv(file):
     df = pd.read_csv(file, encoding="utf-8", names=["d (mm)", "ΔP", "Vb (cm³)"])
 
     return df
@@ -41,11 +41,11 @@ def leer_registro(file):
 ###########
 
 with st.sidebar:
-    txcascadia("Ensayos Triaxiales", "h1")
+    google_text("Soil Triaxial Tests", "h1")
 
-    txcascadia("Configuración ⚙️", "h2")
+    google_text("Settings ⚙️", "h2")
 
-    unit = st.select_slider("Unidad de Esfuerzo 📐", ("kPa", "kg/cm²"))
+    unit = st.select_slider("Stress Units 📐", ("kPa", "kg/cm²"))
 
     if unit == "kPa":
         unit2 = "kN"
@@ -58,7 +58,7 @@ with st.sidebar:
 
     with open(examples_path, "rb") as example_data:
         st.download_button(
-            label="📄 ¡Descargar data de ejemplo!",
+            label="📄 ¡Click here to download example data!",
             data=example_data,
             file_name="example_data.zip",
             mime="application/zip",
@@ -69,15 +69,15 @@ with st.sidebar:
 # Encabezado #
 ##############
 
-txcascadia("🔬 Ensayo Triaxial Consolidado Drenado", "h1")
+google_text("Consolidated Drained Triaxial Test", "h1")
 
 ############################################
 # Primer bloque: Datos de Espécimen Típico #
 ############################################
 
-txcascadia("1️⃣ Datos de Espécimen Típico", "h2")
+google_text("1️⃣ Datos de Espécimen Típico", "h2")
 
-txcascadia("🏳️ Geometría | Remoldeo", "h3", "#434C5E")
+google_text("🏳️ Geometría | Remoldeo", "h3", "#434C5E")
 
 col11, col12, col13 = st.columns([1.0, 1.0, 1.1])
 
@@ -99,12 +99,12 @@ with col13:
 # Segundo bloque: Lectura de Datos de Laboratorio #
 ###################################################
 
-txcascadia("2️⃣ Registros de Laboratorio", "h2")
+google_text("2️⃣ Registros de Laboratorio", "h2")
 
-if "archivos" not in st.session_state:
-    st.session_state["archivos"] = [None] * 3
-if "ensayos" not in st.session_state:
-    st.session_state["ensayos"] = [None] * 3
+if "files" not in st.session_state:
+    st.session_state["files"] = [None] * 3
+if "tests" not in st.session_state:
+    st.session_state["tests"] = [None] * 3
 if "esf_conf" not in st.session_state:
     st.session_state["esf_conf"] = [None] * 3
 
@@ -112,11 +112,11 @@ h_cons = [None] * 3
 v_cons = [None] * 3
 
 
-txcascadia("✔️ Ensayo #1", "h3", "#434C5E")
+google_text("✔️ Ensayo #1", "h3", "#434C5E")
 
 with st.form("formensayo1"):
 
-    verf_archivo1 = True
+    file1_check = True
 
     col1, col2 = st.columns([1.0, 1.0])
 
@@ -147,42 +147,42 @@ with st.form("formensayo1"):
         help="Esfuerzo isotrópico final de la etapa de consolidación.",
     )
     if not esf:
-        verf_archivo1 = False
+        file1_check = False
 
-    archivo1 = st.file_uploader(
+    file1 = st.file_uploader(
         "Resultados del ensayo triaxial CD (.CSV)",
         type="csv",
         help="Registro de datos del equipo triaxial.",
-        key="archivo1",
+        key="file1",
     )
 
     try:
-        st.session_state.ensayos[0] = leer_registro(archivo1)
+        st.session_state.tests[0] = _read_csv(file1)
     except ValueError:
-        verf_archivo1 = False
+        file1_check = False
 
     col1, col2, col3 = st.columns(3)
 
     with col2:
-        confirmar_ens1 = st.form_submit_button(label="🚀 Cargar 1° ensayo")
+        test1_verf = st.form_submit_button(label="🚀 Cargar 1° ensayo")
 
 
-if not confirmar_ens1:
+if not test1_verf:
     pass
 elif (
-    confirmar_ens1 and verf_archivo1
+    test1_verf and file1_check
 ):  # Agregar un checkbox para saber cuando ya este realizado
-    st.session_state.archivos[0] = archivo1
+    st.session_state.files[0] = file1
     st.session_state.esf_conf[0] = esf
 else:
     st.error("❌ Datos incompletos y/o registro inválido.")
 
 
-txcascadia("✔️ Ensayo #2", "h3", "#434C5E")
+google_text("✔️ Ensayo #2", "h3", "#434C5E")
 
 with st.form("formensayo2"):
 
-    verf_archivo2 = True
+    file2_check = True
 
     col1, col2 = st.columns([1.0, 1.0])
 
@@ -212,41 +212,41 @@ with st.form("formensayo2"):
         help="Esfuerzo isotrópico final de la etapa de consolidación.",
     )
     if not esf:
-        verf_archivo2 = False
+        file2_check = False
 
-    archivo2 = st.file_uploader(
+    file2 = st.file_uploader(
         "Resultados del ensayo triaxial CD (.CSV)",
         type="csv",
         help="Registro de datos del equipo triaxial.",
-        key="archivo2",
+        key="file2",
     )
 
     try:
-        st.session_state.ensayos[1] = leer_registro(archivo2)
+        st.session_state.tests[1] = _read_csv(file2)
     except ValueError:
-        verf_archivo2 = False
+        file2_check = False
 
     col1, col2, col3 = st.columns(3)
 
     with col2:
-        confirmar_ens2 = st.form_submit_button(label="🚀 Cargar 2° ensayo")
+        test2_verf = st.form_submit_button(label="🚀 Cargar 2° ensayo")
 
 
-if not confirmar_ens2:
+if not test2_verf:
     pass
 elif (
-    confirmar_ens2 and verf_archivo2
+    test2_verf and file2_check
 ):  # Agregar un checkbox para saber cuando ya este realizado
-    st.session_state.archivos[1] = archivo2
+    st.session_state.files[1] = file2
     st.session_state.esf_conf[1] = esf
 else:
     st.error("❌ Datos incompletos y/o registro inválido.")
 
-txcascadia("✔️ Ensayo #3", "h3", "#434C5E")
+google_text("✔️ Ensayo #3", "h3", "#434C5E")
 
 with st.form("formensayo3"):
 
-    verf_archivo3 = True
+    file3_check = True
 
     col1, col2 = st.columns([1.0, 1.0])
 
@@ -277,37 +277,37 @@ with st.form("formensayo3"):
         help="Esfuerzo isotrópico final de la etapa de consolidación.",
     )
     if not esf:
-        verf_archivo3 = False
+        file3_check = False
 
-    archivo3 = st.file_uploader(
+    file3 = st.file_uploader(
         "Resultados del ensayo triaxial CD (.CSV)",
         type="csv",
         help="Registro de datos del equipo triaxial.",
-        key="archivo3",
+        key="file3",
     )
 
     try:
-        st.session_state.ensayos[2] = leer_registro(archivo3)
+        st.session_state.tests[2] = _read_csv(file3)
     except ValueError:
-        verf_archivo3 = False
+        file3_check = False
 
     col1, col2, col3 = st.columns(3)
 
     with col2:
-        confirmar_ens3 = st.form_submit_button(label="🚀 Cargar 3° ensayo")
+        test3_verf = st.form_submit_button(label="🚀 Cargar 3° ensayo")
 
 
-if not confirmar_ens3:
+if not test3_verf:
     pass
 elif (
-    confirmar_ens3 and verf_archivo3
+    test3_verf and file3_check
 ):  # Agregar un checkbox para saber cuando ya este realizado
-    st.session_state.archivos[2] = archivo3
+    st.session_state.files[2] = file3
     st.session_state.esf_conf[2] = esf
 else:
     st.error("❌ Datos incompletos y/o registro inválido.")
 
-if all(st.session_state.archivos):
+if all(st.session_state.files):
 
     st.success("Todos los registros han sido cargados satisfactoriamente.")
 
@@ -316,26 +316,26 @@ if all(st.session_state.archivos):
 # Tercer Bloque: Resultados de Laboratorio #
 ############################################
 
-txcascadia("3️⃣ Resultados de Laboratorio", "h2")
+google_text("3️⃣ Resultados de Laboratorio", "h2")
 
 # Visualización de Registros #
 ##############################
 
-if all(st.session_state.archivos):
-    txcascadia("📋 Visualización de Registros", "h3", "#434C5E")
+if all(st.session_state.files):
+    google_text("📋 Visualización de Registros", "h3", "#434C5E")
 
-    tabla_labo = st.selectbox(
+    lab_table = st.selectbox(
         "Seleccione uno de los registros de laboratorio.",
         ("Ensayo #1", "Ensayo #2", "Ensayo #3"),
         key="visualizacion",
     )
 
-    tablas = {
-        "Ensayo #1": st.session_state.ensayos[0].iloc[:, [0, 1, 2]],
-        "Ensayo #2": st.session_state.ensayos[1].iloc[:, [0, 1, 2]],
-        "Ensayo #3": st.session_state.ensayos[2].iloc[:, [0, 1, 2]],
+    tables = {
+        "Ensayo #1": st.session_state.tests[0].iloc[:, [0, 1, 2]],
+        "Ensayo #2": st.session_state.tests[1].iloc[:, [0, 1, 2]],
+        "Ensayo #3": st.session_state.tests[2].iloc[:, [0, 1, 2]],
     }
-    tabla = tablas[tabla_labo]
+    tabla = tables[lab_table]
 
     fig = go.Figure(
         data=[
@@ -372,8 +372,8 @@ if all(st.session_state.archivos):
 # Gráficas de Laboratorio #
 ###########################
 
-if all(st.session_state.archivos):
-    txcascadia("📊 Gráficas de Laboratorio", "h3", "#434C5E")
+if all(st.session_state.files):
+    google_text("📊 Gráficas de Laboratorio", "h3", "#434C5E")
 
     graflabo_escogido = st.selectbox(
         "Seleccione uno de los gráficos obtenidos en laboratorio.",
@@ -390,12 +390,12 @@ if all(st.session_state.archivos):
     if graflabo_escogido == "Deformación Axial [d] - Fuerza Axial [ΔP]":
         ptos_max = []
 
-        for ensayo in st.session_state.ensayos:
+        for ensayo in st.session_state.tests:
             ptos_max.append(
                 ensayo.loc[ensayo.iloc[:, 1] == max(ensayo.iloc[:, 1])].iloc[0]
             )
 
-        for j, ensayo in enumerate(st.session_state.ensayos):
+        for j, ensayo in enumerate(st.session_state.tests):
             fig.add_trace(
                 go.Scatter(
                     x=ensayo["d (mm)"],
@@ -456,7 +456,7 @@ if all(st.session_state.archivos):
         )
 
     else:
-        for j, ensayo in enumerate(st.session_state.ensayos):
+        for j, ensayo in enumerate(st.session_state.tests):
             fig.add_trace(
                 go.Scatter(
                     x=ensayo["d (mm)"],
@@ -517,16 +517,16 @@ else:
 # Cuarto bloque: Preprocesamiento de Datos #
 ############################################
 
-txcascadia("4️⃣ Preprocesamiento de Datos", "h2")
+google_text("4️⃣ Preprocesamiento de Datos", "h2")
 
-if all(st.session_state.archivos):
+if all(st.session_state.files):
     hf = [h - hc / 10 for hc in h_cons]
     hf_dict = dict(zip(["Ensayo #1", "Ensayo #2", "Ensayo #3"], hf))
 
     vf = [V - vc for vc in v_cons]
     vf_dict = dict(zip(["Ensayo #1", "Ensayo #2", "Ensayo #3"], vf))
 
-    for i, ensayo in enumerate(st.session_state.ensayos):
+    for i, ensayo in enumerate(st.session_state.tests):
         ensayo["ε (%)"] = ensayo["d (mm)"] / hf[i] * 10
         ensayo["ΔV (%)"] = (ensayo["Vb (cm³)"][0] - ensayo["Vb (cm³)"]) / vf[i] * 100
         ensayo["Ac (cm²)"] = (vf[i] - ensayo["Vb (cm³)"]) / (
@@ -534,7 +534,7 @@ if all(st.session_state.archivos):
         )
         ensayo["Δσ ({0})".format(unit)] = ensayo["ΔP"] / ensayo["Ac (cm²)"] * 10**4
 
-    txcascadia("🏴 Geometría | Consolidación", "h3", "#434C5E")
+    google_text("🏴 Geometría | Consolidación", "h3", "#434C5E")
 
     tabla_preprocs = st.selectbox(
         "Seleccione uno de los registros de laboratorio.",
@@ -561,14 +561,14 @@ if all(st.session_state.archivos):
             disabled=True,
         )
 
-    txcascadia("📋 Resultados del Preprocesamiento", "h3", "#434C5E")
+    google_text("📋 Resultados del Preprocesamiento", "h3", "#434C5E")
 
-    tablas = {
-        "Ensayo #1": st.session_state.ensayos[0].iloc[:, [3, 4, 5, 6]],
-        "Ensayo #2": st.session_state.ensayos[1].iloc[:, [3, 4, 5, 6]],
-        "Ensayo #3": st.session_state.ensayos[2].iloc[:, [3, 4, 5, 6]],
+    tables = {
+        "Ensayo #1": st.session_state.tests[0].iloc[:, [3, 4, 5, 6]],
+        "Ensayo #2": st.session_state.tests[1].iloc[:, [3, 4, 5, 6]],
+        "Ensayo #3": st.session_state.tests[2].iloc[:, [3, 4, 5, 6]],
     }
-    tabla = tablas[tabla_preprocs]
+    tabla = tables[tabla_preprocs]
 
     fig = go.Figure(
         data=[
@@ -610,7 +610,7 @@ if all(st.session_state.archivos):
     # Curvas del Preprocesamiento #
     ###############################
 
-    txcascadia("📊 Curvas del Preprocesamiento", "h3", "#434C5E")
+    google_text("📊 Curvas del Preprocesamiento", "h3", "#434C5E")
 
     grafpreprosc_escogido = st.selectbox(
         "Seleccione uno de los gráficos obtenidos del preprocesamiento.",
@@ -622,14 +622,14 @@ if all(st.session_state.archivos):
 
     ptos_max = []
 
-    for ensayo in st.session_state.ensayos:
+    for ensayo in st.session_state.tests:
         ptos_max.append(ensayo.loc[ensayo.iloc[:, 6] == max(ensayo.iloc[:, 6])].iloc[0])
 
     fig2 = go.Figure()
 
     if grafpreprosc_escogido == "Def. Axial Unitaria [ε] - Esfuerzo Desviador [Δσ]":
 
-        for j, ensayo in enumerate(st.session_state.ensayos):
+        for j, ensayo in enumerate(st.session_state.tests):
             fig2.add_trace(
                 go.Scatter(
                     x=ensayo["ε (%)"],
@@ -690,7 +690,7 @@ if all(st.session_state.archivos):
         )
 
     else:
-        for j, ensayo in enumerate(st.session_state.ensayos):
+        for j, ensayo in enumerate(st.session_state.tests):
             fig2.add_trace(
                 go.Scatter(
                     x=ensayo["ε (%)"],
@@ -752,14 +752,14 @@ else:
 # Quinto bloque: Procesamiento y Resultados #
 #############################################
 
-txcascadia("5️⃣ Procesamiento y Resultados", "h2")
+google_text("5️⃣ Procesamiento y Resultados", "h2")
 
-if all(st.session_state.archivos):
+if all(st.session_state.files):
 
     # Trayectorias de Esfuerzos #
     #############################
 
-    txcascadia("📈 Trayectorias de Esfuerzos", "h3", "#434C5E")
+    google_text("📈 Trayectorias de Esfuerzos", "h3", "#434C5E")
 
     convencion = st.radio(
         "Escoga una convención para el cálculo de las invariantes de esfuerzos.",
@@ -767,7 +767,7 @@ if all(st.session_state.archivos):
     )
 
     if convencion == "University of Cambridge":
-        for i, ensayo in enumerate(st.session_state.ensayos):
+        for i, ensayo in enumerate(st.session_state.tests):
             ensayo["p' ({0})".format(unit)] = (
                 st.session_state.esf_conf[i] + ensayo["Δσ ({0})".format(unit)] / 3
             )
@@ -778,7 +778,7 @@ if all(st.session_state.archivos):
             )
             ensayo["q [M.I.T]"] = ensayo["Δσ ({0})".format(unit)] / 2
     else:
-        for i, ensayo in enumerate(st.session_state.ensayos):
+        for i, ensayo in enumerate(st.session_state.tests):
             ensayo["p' ({0})".format(unit)] = (
                 st.session_state.esf_conf[i] + ensayo["Δσ ({0})".format(unit)] / 2
             )
@@ -786,7 +786,7 @@ if all(st.session_state.archivos):
 
     fig3 = go.Figure()
 
-    for i, ensayo in enumerate(st.session_state.ensayos):
+    for i, ensayo in enumerate(st.session_state.tests):
         fig3.add_trace(
             go.Scatter(
                 x=ensayo["p' ({0})".format(unit)],
@@ -809,20 +809,20 @@ if all(st.session_state.archivos):
 
     if convencion == "University of Cambridge":
         p_falla_MIT = np.array(
-            [ensayo["p' [M.I.T]"].iloc[-1] for ensayo in st.session_state.ensayos]
+            [ensayo["p' [M.I.T]"].iloc[-1] for ensayo in st.session_state.tests]
         ).reshape(-1, 1)
         q_falla_MIT = np.array(
-            [ensayo["q [M.I.T]"].iloc[-1] for ensayo in st.session_state.ensayos]
+            [ensayo["q [M.I.T]"].iloc[-1] for ensayo in st.session_state.tests]
         )
 
         modelo_MIT = LinearRegression()
         modelo_MIT.fit(p_falla_MIT, q_falla_MIT)
 
     p_falla = np.array(
-        [ensayo["p' ({0})".format(unit)].iloc[-1] for ensayo in st.session_state.ensayos]
+        [ensayo["p' ({0})".format(unit)].iloc[-1] for ensayo in st.session_state.tests]
     ).reshape(-1, 1)
     q_falla = np.array(
-        [ensayo["q ({0})".format(unit)].iloc[-1] for ensayo in st.session_state.ensayos]
+        [ensayo["q ({0})".format(unit)].iloc[-1] for ensayo in st.session_state.tests]
     )
 
     modelo = LinearRegression()
@@ -905,7 +905,7 @@ if all(st.session_state.archivos):
     # Círculos de Mohr #
     ####################
 
-    txcascadia("📉 Círculos de Mohr", "h3", "#434C5E")
+    google_text("📉 Círculos de Mohr", "h3", "#434C5E")
 
     if convencion == "University of Cambridge":
         phi = float(np.degrees(np.arcsin(modelo_MIT.coef_)))
@@ -1016,20 +1016,20 @@ if all(st.session_state.archivos):
     # Resumen de Resultados #
     ########################
 
-    txcascadia("🎈 Resumen de Resultados", "h3", "#434C5E")
+    google_text("🎈 Resumen de Resultados", "h3", "#434C5E")
 
     resultados = pd.DataFrame(
         {
-            "Ensayos": ["Ensayo #1", "Ensayo #2", "Ensayo #3"],
+            "tests": ["Ensayo #1", "Ensayo #2", "Ensayo #3"],
             "σ3 ({0})".format(unit): [
                 st.session_state["esf_conf"][0],
                 st.session_state["esf_conf"][1],
                 st.session_state["esf_conf"][2],
             ],
             "Δσf ({0})".format(unit): [
-                max(st.session_state.ensayos[0]["Δσ ({0})".format(unit)]),
-                max(st.session_state.ensayos[1]["Δσ ({0})".format(unit)]),
-                max(st.session_state.ensayos[2]["Δσ ({0})".format(unit)]),
+                max(st.session_state.tests[0]["Δσ ({0})".format(unit)]),
+                max(st.session_state.tests[1]["Δσ ({0})".format(unit)]),
+                max(st.session_state.tests[2]["Δσ ({0})".format(unit)]),
             ],
         }
     )
@@ -1042,7 +1042,7 @@ if all(st.session_state.archivos):
                     font_family="Cascadia Code",
                     font_size=13,
                     font_color="#ECEFF4",
-                    fill_color="#4C566A",
+                    fill_color=["#4C566A", "#81A1C1", "#81A1C1"],
                     align="center",
                     height=30,
                 ),
@@ -1054,7 +1054,7 @@ if all(st.session_state.archivos):
                     ],
                     font_family="Cascadia Code",
                     font_size=13,
-                    fill_color="#E5E9F0",
+                    fill_color=["#D8DEE9", "#E5E9F0", "#E5E9F0"],
                     align="center",
                     height=26,
                     format=["", ".2f", ".2f"],
