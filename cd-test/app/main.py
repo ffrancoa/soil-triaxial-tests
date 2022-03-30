@@ -10,7 +10,7 @@ CUSTOM_FONT = "JetBrains Mono"
 
 CUSTOM_FONT_URL = """<link rel="preconnect" href="https://fonts.googleapis.com">
                      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-                     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono&display=block" rel="stylesheet">"""
+                     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono&display=swap" rel="stylesheet">"""
 
 ROOT_DIR = os.path.realpath(os.path.join(os.path.dirname(__file__), "..", ".."))
 
@@ -37,8 +37,6 @@ def _read_csv(file):
     return df
 
 
-# TODO: Remover la fuenteCUSTOM_FONT ya que esta no la intepretan otros navegadores además del mío
-
 ###########
 # Sidebar #
 ###########
@@ -48,7 +46,7 @@ with st.sidebar:
 
     googlef_text("Settings ⚙️", key="h2")
 
-    unit = st.select_slider("Stress Units 📐", ("kPa", "kg/cm²"))
+    unit = st.selectbox("Stress Units 📐", ("kPa", "kg/cm²"))
 
     if unit == "kPa":
         unit2 = "kN"
@@ -61,7 +59,7 @@ with st.sidebar:
 
     with open(examples_path, "rb") as example_data:
         st.download_button(
-            label="📄 ¡Click here to download example data!",
+            label="📄 Click here to download example data!",
             data=example_data,
             file_name="example_data.zip",
             mime="application/zip",
@@ -94,7 +92,7 @@ with col13:
     V = st.number_input(
         "Initial volume (cm³)",
         value=(3.1416 * D**2) / 4 * h,
-        help="Volumen calculado a partir de las dimensiones iniciales del espécimen.",
+        help="Volume calculated since the initial conditions of the specimen.",
         disabled=True,
     )
 
@@ -102,7 +100,7 @@ with col13:
 # Segundo bloque: Lectura de Datos de Laboratorio #
 ###################################################
 
-googlef_text("2️⃣ Registros de Laboratorio", key="h2")
+googlef_text("2️⃣ Laboratory Records", key="h2")
 
 if "files" not in st.session_state:
     st.session_state["files"] = [None] * 3
@@ -115,7 +113,7 @@ h_cons = [None] * 3
 v_cons = [None] * 3
 
 
-googlef_text("✔️ Ensayo #1", key="h3", color="#434C5E")
+googlef_text("✔️ Test #1", key="h3", color="#434C5E")
 
 with st.form("formensayo1"):
 
@@ -149,8 +147,12 @@ with st.form("formensayo1"):
         key="esf1",
         help="Esfuerzo isotrópico final de la etapa de consolidación.",
     )
-    if not esf:
+    if esf in st.session_state["esf_conf"]:
         file1_check = False
+        error_message = "Radial stresses must be different from each other."
+    elif not esf:
+        file1_check = False
+        error_message = "Radial stress must be indicated."
 
     file1 = st.file_uploader(
         "Resultados del ensayo triaxial CD (.CSV)",
@@ -163,11 +165,12 @@ with st.form("formensayo1"):
         st.session_state.tests[0] = _read_csv(file1)
     except ValueError:
         file1_check = False
+        error_message = "Invalid test record."
 
     col1, col2, col3 = st.columns(3)
 
     with col2:
-        test1_verf = st.form_submit_button(label="🚀 Cargar 1° ensayo")
+        test1_verf = st.form_submit_button(label="🚀 Load 1st test!")
 
 
 if not test1_verf:
@@ -178,10 +181,10 @@ elif (
     st.session_state.files[0] = file1
     st.session_state.esf_conf[0] = esf
 else:
-    st.error("❌ Datos incompletos y/o registro inválido.")
+    st.error("❌ {0}".format(error_message))
 
 
-googlef_text("✔️ Ensayo #2", key="h3", color="#434C5E")
+googlef_text("✔️ Test #2", key="h3", color="#434C5E")
 
 with st.form("formensayo2"):
 
@@ -214,8 +217,12 @@ with st.form("formensayo2"):
         key="esf2",
         help="Esfuerzo isotrópico final de la etapa de consolidación.",
     )
-    if not esf:
+    if esf in st.session_state["esf_conf"]:
         file2_check = False
+        error_message = "Radial stresses must be different from each other."
+    elif not esf:
+        file2_check = False
+        error_message = "Radial stress must be indicated."
 
     file2 = st.file_uploader(
         "Resultados del ensayo triaxial CD (.CSV)",
@@ -228,24 +235,25 @@ with st.form("formensayo2"):
         st.session_state.tests[1] = _read_csv(file2)
     except ValueError:
         file2_check = False
+        error_message = "Invalid test record."
 
     col1, col2, col3 = st.columns(3)
 
     with col2:
-        test2_verf = st.form_submit_button(label="🚀 Cargar 2° ensayo")
+        test2_verf = st.form_submit_button(label="🚀 Load 2nd test!")
 
 
 if not test2_verf:
     pass
 elif (
     test2_verf and file2_check
-):  # Agregar un checkbox para saber cuando ya este realizado
+):  # TODO: Agregar un checkbox para saber cuando ya este realizado
     st.session_state.files[1] = file2
     st.session_state.esf_conf[1] = esf
 else:
-    st.error("❌ Datos incompletos y/o registro inválido.")
+    st.error("❌ {0}".format(error_message))
 
-googlef_text("✔️ Ensayo #3", key="h3", color="#434C5E")
+googlef_text("✔️ Test #3", key="h3", color="#434C5E")
 
 with st.form("formensayo3"):
 
@@ -279,8 +287,12 @@ with st.form("formensayo3"):
         key="esf3",
         help="Esfuerzo isotrópico final de la etapa de consolidación.",
     )
-    if not esf:
+    if esf in st.session_state["esf_conf"]:
         file3_check = False
+        error_message = "Radial stresses must be different from each other."
+    elif not esf:
+        file3_check = False
+        error_message = "Radial stress must be indicated."
 
     file3 = st.file_uploader(
         "Resultados del ensayo triaxial CD (.CSV)",
@@ -293,11 +305,12 @@ with st.form("formensayo3"):
         st.session_state.tests[2] = _read_csv(file3)
     except ValueError:
         file3_check = False
+        error_message = "Invalid test record."
 
     col1, col2, col3 = st.columns(3)
 
     with col2:
-        test3_verf = st.form_submit_button(label="🚀 Cargar 3° ensayo")
+        test3_verf = st.form_submit_button(label="🚀 Load 3rd test!")
 
 
 if not test3_verf:
@@ -308,7 +321,7 @@ elif (
     st.session_state.files[2] = file3
     st.session_state.esf_conf[2] = esf
 else:
-    st.error("❌ Datos incompletos y/o registro inválido.")
+    st.error("❌ {0}".format(error_message))
 
 if all(st.session_state.files):
 
@@ -319,24 +332,24 @@ if all(st.session_state.files):
 # Tercer Bloque: Resultados de Laboratorio #
 ############################################
 
-googlef_text("3️⃣ Resultados de Laboratorio", key="h2")
+googlef_text("3️⃣ Laboratory Results", key="h2")
 
 # Visualización de Registros #
 ##############################
 
 if all(st.session_state.files):
-    googlef_text("📋 Visualización de Registros", key="h3", color="#434C5E")
+    googlef_text("📋 Records Tables", key="h3", color="#434C5E")
 
     lab_table = st.selectbox(
         "Seleccione uno de los registros de laboratorio.",
-        ("Ensayo #1", "Ensayo #2", "Ensayo #3"),
+        ("Test #1", "Test #2", "Test #3"),
         key="visualizacion",
     )
 
     tables = {
-        "Ensayo #1": st.session_state.tests[0].iloc[:, [0, 1, 2]],
-        "Ensayo #2": st.session_state.tests[1].iloc[:, [0, 1, 2]],
-        "Ensayo #3": st.session_state.tests[2].iloc[:, [0, 1, 2]],
+        "Test #1": st.session_state.tests[0].iloc[:, [0, 1, 2]],
+        "Test #2": st.session_state.tests[1].iloc[:, [0, 1, 2]],
+        "Test #3": st.session_state.tests[2].iloc[:, [0, 1, 2]],
     }
     tabla = tables[lab_table]
 
@@ -376,7 +389,7 @@ if all(st.session_state.files):
 ###########################
 
 if all(st.session_state.files):
-    googlef_text("📊 Gráficas de Laboratorio", key="h3", color="#434C5E")
+    googlef_text("📊 Laboratory Graphs", key="h3", color="#434C5E")
 
     graflabo_escogido = st.selectbox(
         "Seleccione uno de los gráficos obtenidos en laboratorio.",
@@ -403,7 +416,7 @@ if all(st.session_state.files):
                 go.Scatter(
                     x=ensayo["d (mm)"],
                     y=ensayo["ΔP"],
-                    name="Ensayo #{}".format(j + 1),
+                    name="Test #{}".format(j + 1),
                     line=dict(color=colores[j + 1]),
                     text="σ₀ = {}".format(st.session_state.esf_conf[j]),
                 ),
@@ -414,7 +427,7 @@ if all(st.session_state.files):
                 go.Scatter(
                     x=np.array(pair[0]),
                     y=np.array(pair[1]),
-                    name="Ensayo #{}".format(j + 1),
+                    name="Test #{}".format(j + 1),
                     marker_size=8,
                     marker_color=colores[j + 1],
                     text="σ₀ = {}".format(st.session_state.esf_conf[j]),
@@ -464,7 +477,7 @@ if all(st.session_state.files):
                 go.Scatter(
                     x=ensayo["d (mm)"],
                     y=ensayo["Vb (cm³)"],
-                    name="Ensayo #{}".format(j + 1),
+                    name="Test #{}".format(j + 1),
                     line=dict(color=colores[j + 1]),
                     text="σ₀ = {}".format(st.session_state.esf_conf[j]),
                 ),
@@ -520,14 +533,14 @@ else:
 # Cuarto bloque: Preprocesamiento de Datos #
 ############################################
 
-googlef_text("4️⃣ Preprocesamiento de Datos", key="h2")
+googlef_text("4️⃣ Data Preprocesing", key="h2")
 
 if all(st.session_state.files):
     hf = [h - hc / 10 for hc in h_cons]
-    hf_dict = dict(zip(["Ensayo #1", "Ensayo #2", "Ensayo #3"], hf))
+    hf_dict = dict(zip(["Test #1", "Test #2", "Test #3"], hf))
 
     vf = [V - vc for vc in v_cons]
-    vf_dict = dict(zip(["Ensayo #1", "Ensayo #2", "Ensayo #3"], vf))
+    vf_dict = dict(zip(["Test #1", "Test #2", "Test #3"], vf))
 
     for i, ensayo in enumerate(st.session_state.tests):
         ensayo["ε (%)"] = ensayo["d (mm)"] / hf[i] * 10
@@ -541,7 +554,7 @@ if all(st.session_state.files):
 
     tabla_preprocs = st.selectbox(
         "Seleccione uno de los registros de laboratorio.",
-        ("Ensayo #1", "Ensayo #2", "Ensayo #3"),
+        ("Test #1", "Test #2", "Test #3"),
         key="preprocesamiento",
     )
 
@@ -564,12 +577,12 @@ if all(st.session_state.files):
             disabled=True,
         )
 
-    googlef_text("📋 Resultados del Preprocesamiento", key="h3", color="#434C5E")
+    googlef_text("📋 Preprocesing Results", key="h3", color="#434C5E")
 
     tables = {
-        "Ensayo #1": st.session_state.tests[0].iloc[:, [3, 4, 5, 6]],
-        "Ensayo #2": st.session_state.tests[1].iloc[:, [3, 4, 5, 6]],
-        "Ensayo #3": st.session_state.tests[2].iloc[:, [3, 4, 5, 6]],
+        "Test #1": st.session_state.tests[0].iloc[:, [3, 4, 5, 6]],
+        "Test #2": st.session_state.tests[1].iloc[:, [3, 4, 5, 6]],
+        "Test #3": st.session_state.tests[2].iloc[:, [3, 4, 5, 6]],
     }
     tabla = tables[tabla_preprocs]
 
@@ -613,12 +626,12 @@ if all(st.session_state.files):
     # Curvas del Preprocesamiento #
     ###############################
 
-    googlef_text("📊 Curvas del Preprocesamiento", key="h3", color="#434C5E")
+    googlef_text("📊 Preprocesing Results", key="h3", color="#434C5E")
 
     grafpreprosc_escogido = st.selectbox(
         "Seleccione uno de los gráficos obtenidos del preprocesamiento.",
         (
-            "Def. Axial Unitaria [ε] - Esfuerzo Desviador [Δσ]",
+            "Def. Axial Unitaria [ε] - Deviatoric Stress [Δσ]",
             "Def. Axial Unitaria [ε] - Def. Volumétrica Unitaria [ΔV]",
         ),
     )
@@ -630,14 +643,14 @@ if all(st.session_state.files):
 
     fig2 = go.Figure()
 
-    if grafpreprosc_escogido == "Def. Axial Unitaria [ε] - Esfuerzo Desviador [Δσ]":
+    if grafpreprosc_escogido == "Def. Axial Unitaria [ε] - Deviatoric Stress [Δσ]":
 
         for j, ensayo in enumerate(st.session_state.tests):
             fig2.add_trace(
                 go.Scatter(
                     x=ensayo["ε (%)"],
                     y=ensayo["Δσ ({0})".format(unit)],
-                    name="Ensayo #{}".format(j + 1),
+                    name="Test #{}".format(j + 1),
                     line=dict(color=colores[j + 1]),
                     text="σ₀ = {}".format(st.session_state.esf_conf[j]),
                 ),
@@ -648,7 +661,7 @@ if all(st.session_state.files):
                 go.Scatter(
                     x=np.array(pair[3]),
                     y=np.array(pair[6]),
-                    name="Ensayo #{}".format(j + 1),
+                    name="Test #{}".format(j + 1),
                     marker_size=8,
                     marker_color=colores[j + 1],
                     text="σ₀ = {}".format(st.session_state.esf_conf[j]),
@@ -665,7 +678,7 @@ if all(st.session_state.files):
             )
 
         fig2.update_xaxes(
-            title_text="Deformación Axial Unitaria, ε (%)",
+            title_text="Axial Strain, ε (%)",
             tickfont_size=13,
             fixedrange=True,
             showgrid=True,
@@ -679,7 +692,7 @@ if all(st.session_state.files):
         )
 
         fig2.update_yaxes(
-            title_text="Esfuerzo Desviador, Δσ ({0})".format(unit),
+            title_text="Deviatoric Stress, Δσ ({0})".format(unit),
             tickfont_size=13,
             fixedrange=True,
             showgrid=True,
@@ -698,14 +711,14 @@ if all(st.session_state.files):
                 go.Scatter(
                     x=ensayo["ε (%)"],
                     y=ensayo["ΔV (%)"],
-                    name="Ensayo #{}".format(j + 1),
+                    name="Test #{}".format(j + 1),
                     line=dict(color=colores[j + 1]),
                     text="σ₀ = {}".format(st.session_state.esf_conf[j]),
                 ),
             )
 
         fig2.update_xaxes(
-            title_text="Deformación Axial Unitaria, ε (%)",
+            title_text="Axial Strain, ε (%)",
             tickfont_size=13,
             fixedrange=True,
             showgrid=True,
@@ -719,7 +732,7 @@ if all(st.session_state.files):
         )
 
         fig2.update_yaxes(
-            title_text="Deformación Volumétrica Unitaria, ΔV (%)",
+            title_text="Volumetric Strain, ΔV (%)",
             tickfont_size=13,
             fixedrange=True,
             showgrid=True,
@@ -755,14 +768,14 @@ else:
 # Quinto bloque: Procesamiento y Resultados #
 #############################################
 
-googlef_text("5️⃣ Procesamiento y Resultados", key="h2")
+googlef_text("5️⃣ Procesing and Results", key="h2")
 
 if all(st.session_state.files):
 
     # Trayectorias de Esfuerzos #
     #############################
 
-    googlef_text("📈 Trayectorias de Esfuerzos", key="h3", color="#434C5E")
+    googlef_text("📈 Stress Paths", key="h3", color="#434C5E")
 
     convencion = st.radio(
         "Escoga una convención para el cálculo de las invariantes de esfuerzos.",
@@ -794,7 +807,7 @@ if all(st.session_state.files):
             go.Scatter(
                 x=ensayo["p' ({0})".format(unit)],
                 y=ensayo["q ({0})".format(unit)],
-                name="Ensayo #{}".format(i + 1),
+                name="Test #{}".format(i + 1),
                 line=dict(color=colores[i + 1]),
                 text="σ₀ = {}".format(st.session_state.esf_conf[i]),
             )
@@ -803,7 +816,7 @@ if all(st.session_state.files):
             go.Scatter(
                 x=np.array(ensayo["p' ({0})".format(unit)].iloc[-1]),
                 y=np.array(ensayo["q ({0})".format(unit)].iloc[-1]),
-                name="Ensayo #{}".format(i + 1),
+                name="Test #{}".format(i + 1),
                 marker_size=7,
                 marker_color=colores[i + 1],
                 text="σ₀ = {}".format(st.session_state.esf_conf[i]),
@@ -841,7 +854,7 @@ if all(st.session_state.files):
         go.Scatter(
             x=rango_p,
             y=rango_q,
-            name="Envolvente M.",
+            name="Mod. Envelope",
             mode="lines",
             line={"dash": "dash", "color": "#4C566A", "width": 2},
             opacity=0.5,
@@ -908,7 +921,7 @@ if all(st.session_state.files):
     # Círculos de Mohr #
     ####################
 
-    googlef_text("📉 Círculos de Mohr", key="h3", color="#434C5E")
+    googlef_text("📉 Mohr Circles", key="h3", color="#434C5E")
 
     if convencion == "University of Cambridge":
         phi = float(np.degrees(np.arcsin(modelo_MIT.coef_)))
@@ -1019,12 +1032,12 @@ if all(st.session_state.files):
     # Resumen de Resultados #
     ########################
 
-    googlef_text("🎈 Resumen de Resultados", key="h3", color="#434C5E")
+    googlef_text("🎈 Summary of Results", key="h3", color="#434C5E")
 
     resultados = pd.DataFrame(
         {
-            "tests": ["Ensayo #1", "Ensayo #2", "Ensayo #3"],
-            "σ3 ({0})".format(unit): [
+            "Tests": ["Test #1", "Test #2", "Test #3"],
+            "σr' ({0})".format(unit): [
                 st.session_state["esf_conf"][0],
                 st.session_state["esf_conf"][1],
                 st.session_state["esf_conf"][2],
