@@ -56,10 +56,10 @@ def set_app_config(
         f.write("\nfont = '{0}'".format(font_style))
 
 
-def googlef_text(
-    text: str, key="p", color="#2E3440", font=CUSTOM_FONT, font_url=CUSTOM_FONT_URL
-):
-    st.markdown(font_url, unsafe_allow_html=True)
+st.markdown(CUSTOM_FONT_URL, unsafe_allow_html=True)
+
+
+def googlef_text(text: str, key="p", color="#2E3440", font=CUSTOM_FONT):
 
     text = """<{0} style="font-family: '{1}', monospace;color:{2};">{3}</{4}>""".format(
         key, font, color, text, key
