@@ -26,9 +26,11 @@ THEMES = {
     },
 }
 
+DEFAULT_THEME = THEMES["nord-light"]
+
 
 def set_app_config(
-    palette_name: object,
+    palette_name: object = DEFAULT_THEME,
     config_folder_path: str = os.path.join(ROOT_DIR, ".streamlit"),
     font_style: str = "monospace",
     max_upload_size: int = 1,
@@ -56,12 +58,9 @@ def set_app_config(
         f.write("\nfont = '{0}'".format(font_style))
 
 
-st.markdown(CUSTOM_FONT_URL, unsafe_allow_html=True)
+def googlef_text(text: str, key="p", color=DEFAULT_THEME["textColor"], font=CUSTOM_FONT):
 
-
-def googlef_text(text: str, key="p", color="#2E3440", font=CUSTOM_FONT):
-
-    text = """<{0} style="font-family: '{1}', monospace;color:{2};">{3}</{4}>""".format(
+    text = """<{0} style="font-family: '{1}', monospace;color: {2};">{3}</{4}>""".format(
         key, font, color, text, key
     )
 

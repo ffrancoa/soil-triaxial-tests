@@ -22,6 +22,8 @@ sys.path.append(os.path.join(ROOT_DIR, "utils"))
 
 import st_utils as _st
 
+st.markdown(_st.CUSTOM_FONT_URL, unsafe_allow_html=True)
+
 
 @st.cache(allow_output_mutation=True)
 def _read_csv(file):
