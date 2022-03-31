@@ -1,25 +1,33 @@
-import os
-import sys
-
-import numpy as np
-import pandas as pd
 import streamlit as st
-import plotly.graph_objects as go
+import pandas as pd
+import numpy as np
+import os
 
+import plotly.graph_objects as go
 from sklearn.linear_model import LinearRegression
+
+CUSTOM_FONT = "JetBrains Mono"
+
+CUSTOM_FONT_URL = """<link rel="preconnect" href="https://fonts.googleapis.com">
+                     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+                     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono&display=swap" rel="stylesheet">"""
 
 ROOT_DIR = os.path.realpath(os.path.join(os.path.dirname(__file__), "..", ".."))
 
 st.set_page_config(
     page_title="Soil Triaxial Tests",
-    page_icon=os.path.join(ROOT_DIR, "media", "logo.png"),
+    page_icon=os.path.join(ROOT_DIR, "utils", "logo.png"),
     initial_sidebar_state="collapsed",
 )
 
+st.markdown(CUSTOM_FONT_URL, unsafe_allow_html=True)
 
-sys.path.insert(1, os.path.join(ROOT_DIR, "utils"))
 
-from style_utils import *
+def googlef_text(text, font=CUSTOM_FONT, key="p", color="#2E3440"):
+    text = """<{0} style="font-family: '{1}', monospace;color:{2};">{3}</{4}>""".format(
+        key, font, color, text, key
+    )
+    st.markdown(text, unsafe_allow_html=True)
 
 
 @st.cache(allow_output_mutation=True)
@@ -47,7 +55,7 @@ with st.sidebar:
 
     st.write("")
 
-    examples_path = os.path.join(ROOT_DIR, "cd-test", "data", "example_data_cd.zip")
+    examples_path = os.path.join(ROOT_DIR, "cd-test", "data", "example_data.zip")
 
     with open(examples_path, "rb") as example_data:
         st.download_button(
