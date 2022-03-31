@@ -3,11 +3,11 @@ import streamlit as st
 
 ROOT_DIR = os.path.realpath(os.path.join(os.path.dirname(__file__), ".."))
 
-CUSTOM_FONT = "JetBrains Mono"
+CUSTOM_FONT = "Roboto Mono"
 
 CUSTOM_FONT_URL = """<link rel="preconnect" href="https://fonts.googleapis.com">
                      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-                     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono&display=block" rel="stylesheet">"""
+                     <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap" rel="stylesheet">"""
 
 THEMES = {
     "nord-light": {
@@ -56,7 +56,6 @@ def set_app_config(
         f.write("\nfont = '{0}'".format(font_style))
 
 
-@st.cache()
 def googlef_text(
     text: str, key="p", color="#2E3440", font=CUSTOM_FONT, font_url=CUSTOM_FONT_URL
 ):
