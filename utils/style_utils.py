@@ -61,6 +61,3 @@ def googlef_text(text: str, key="p", color="#2E3440", font=CUSTOM_FONT):
         key, font, color, text, key
     )
     st.markdown(text, unsafe_allow_html=True)
-
-
-st.markdown(CUSTOM_FONT_URL, unsafe_allow_html=True)

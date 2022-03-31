@@ -8,7 +8,9 @@ import plotly.graph_objects as go
 
 from sklearn.linear_model import LinearRegression
 
+
 ROOT_DIR = os.path.realpath(os.path.join(os.path.dirname(__file__), "..", ".."))
+
 
 st.set_page_config(
     page_title="Soil Triaxial Tests",
@@ -16,10 +18,11 @@ st.set_page_config(
     initial_sidebar_state="collapsed",
 )
 
-
-sys.path.insert(1, os.path.join(ROOT_DIR, "utils"))
+sys.path.append(os.path.join(ROOT_DIR, "utils"))
 
 from style_utils import *
+
+st.markdown(CUSTOM_FONT_URL, unsafe_allow_html=True)
 
 
 @st.cache(allow_output_mutation=True)
