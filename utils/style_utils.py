@@ -56,6 +56,7 @@ def set_app_config(
         f.write("\nfont = '{0}'".format(font_style))
 
 
+@st.cache()
 def googlef_text(
     text: str, key="p", color="#2E3440", font=CUSTOM_FONT, font_url=CUSTOM_FONT_URL
 ):
