@@ -7,7 +7,7 @@ CUSTOM_FONT = "JetBrains Mono"
 
 CUSTOM_FONT_URL = """<link rel="preconnect" href="https://fonts.googleapis.com">
                      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-                     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono&display=swap" rel="stylesheet">"""
+                     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono&display=block" rel="stylesheet">"""
 
 THEMES = {
     "nord-light": {
@@ -56,7 +56,7 @@ def set_app_config(
         f.write("\nfont = '{0}'".format(font_style))
 
 
-def googlef_text(text: str, key="p", color="#2E3440", font="CUSTOM_FONT"):
+def googlef_text(text: str, key="p", color="#2E3440", font=CUSTOM_FONT):
     text = """<{0} style="font-family: '{1}', monospace;color:{2};">{3}</{4}>""".format(
         key, font, color, text, key
     )
