@@ -1,4 +1,6 @@
 import os
+
+import pandas as pd
 import streamlit as st
 
 ROOT_DIR = os.path.realpath(os.path.join(os.path.dirname(__file__), ".."))
@@ -65,3 +67,9 @@ def googlef_text(text: str, key="p", color=DEFAULT_THEME["textColor"], font=CUST
     )
 
     st.markdown(text, unsafe_allow_html=True)
+
+
+@st.cache(allow_output_mutation=True)
+def read_csv(filename):
+    df = pd.read_csv(filename, encoding="utf-8", names=["d (mm)", "ΔP", "Vb (cm³)"])
+    return df

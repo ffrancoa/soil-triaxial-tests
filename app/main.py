@@ -1,12 +1,12 @@
 import os
-import st_utils as _st
 
 import numpy as np
 import pandas as pd
 import streamlit as st
 import plotly.graph_objects as go
-
 from sklearn.linear_model import LinearRegression
+
+import st_utils as _st
 
 st.set_page_config(
     page_title="Soil Triaxial Tests",
@@ -15,13 +15,6 @@ st.set_page_config(
 )
 
 st.markdown(_st.CUSTOM_FONT_URL, unsafe_allow_html=True)
-
-
-@st.cache(allow_output_mutation=True)
-def _read_csv(file):
-    df = pd.read_csv(file, encoding="utf-8", names=["d (mm)", "ΔP", "Vb (cm³)"])
-
-    return df
 
 
 ###########
@@ -142,14 +135,14 @@ with st.form("formensayo1"):
         error_message = "Radial stress must be indicated."
 
     file1 = st.file_uploader(
-        "Resultados del ensayo triaxial CD (.CSV)",
+        "Triaxial test record (.CSV)",
         type="csv",
         help="Registro de datos del equipo triaxial.",
         key="file1",
     )
 
     try:
-        st.session_state.tests[0] = _read_csv(file1)
+        st.session_state.tests[0] = _st.read_csv(file1)
     except ValueError:
         file1_check = False
         error_message = "Invalid test record."
@@ -212,14 +205,14 @@ with st.form("formensayo2"):
         error_message = "Radial stress must be indicated."
 
     file2 = st.file_uploader(
-        "Resultados del ensayo triaxial CD (.CSV)",
+        "Triaxial test record (.CSV)",
         type="csv",
         help="Registro de datos del equipo triaxial.",
         key="file2",
     )
 
     try:
-        st.session_state.tests[1] = _read_csv(file2)
+        st.session_state.tests[1] = _st.read_csv(file2)
     except ValueError:
         file2_check = False
         error_message = "Invalid test record."
@@ -282,14 +275,14 @@ with st.form("formensayo3"):
         error_message = "Radial stress must be indicated."
 
     file3 = st.file_uploader(
-        "Resultados del ensayo triaxial CD (.CSV)",
+        "Triaxial test record (.CSV)",
         type="csv",
         help="Registro de datos del equipo triaxial.",
         key="file3",
     )
 
     try:
-        st.session_state.tests[2] = _read_csv(file3)
+        st.session_state.tests[2] = _st.read_csv(file3)
     except ValueError:
         file3_check = False
         error_message = "Invalid test record."
