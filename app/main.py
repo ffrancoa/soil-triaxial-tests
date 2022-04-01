@@ -1,5 +1,5 @@
 import os
-import sys
+import st_utils as _st
 
 import numpy as np
 import pandas as pd
@@ -8,19 +8,11 @@ import plotly.graph_objects as go
 
 from sklearn.linear_model import LinearRegression
 
-
-ROOT_DIR = os.path.realpath(os.path.join(os.path.dirname(__file__), "..", ".."))
-
-
 st.set_page_config(
     page_title="Soil Triaxial Tests",
-    page_icon=os.path.join(ROOT_DIR, "media", "logo.png"),
+    page_icon=os.path.join(_st.ROOT_DIR, "media", "logo.png"),
     initial_sidebar_state="collapsed",
 )
-
-sys.path.append(os.path.join(ROOT_DIR, "utils"))
-
-import st_utils as _st
 
 st.markdown(_st.CUSTOM_FONT_URL, unsafe_allow_html=True)
 
@@ -48,13 +40,13 @@ with st.sidebar:
     else:
         unit2 = "kg"
 
-    st.write("")
-
-    examples_path = os.path.join(ROOT_DIR, "cd-test", "data", "example_data_cd.zip")
+    examples_path = os.path.join(
+        _st.ROOT_DIR, "app", "cd-test", "data", "example_data_cd.zip"
+    )
 
     with open(examples_path, "rb") as example_data:
         st.download_button(
-            label="📄 Click here to download example data!",
+            label="📄 Download example data!",
             data=example_data,
             file_name="example_data.zip",
             mime="application/zip",
@@ -73,7 +65,7 @@ _st.googlef_text("Consolidated Drained Triaxial Test", key="h1")
 
 _st.googlef_text("1️⃣ Tipical Specimen Parameters", key="h2")
 
-_st.googlef_text("🏳️ Geometry | Preparation", key="h3", color="#434C5E")
+_st.googlef_text("🏳️ Geometry | Before Consolidation", key="h3", color="#434C5E")
 
 col11, col12, col13 = st.columns([1.0, 1.0, 1.1])
 
@@ -118,10 +110,10 @@ with st.form("formensayo1"):
 
     with col1:
         h_cons[0] = st.number_input(
-            "Deformación vertical (mm)",
+            "Vertical deformation (mm)",
             min_value=0.0,
             key="h1",
-            help="Deformación final producida en etapa de consolidación.",
+            help="Change in height of specimen at the end of consolidation.",
             format="%.3f",
             step=0.001,
         )
@@ -129,18 +121,18 @@ with st.form("formensayo1"):
     with col2:
 
         v_cons[0] = st.number_input(
-            "Variación volumétrica (cm³)",
+            "Volumetric variation (cm³)",
             min_value=0.0,
             key="v1",
-            help="Volumen total desplazado en la etapa de consolidación.",
+            help="Change in volume of specimen during consolidation as indicated by burette readings.",
         )
 
     esf = st.number_input(
-        "Esfuerzo de confinamiento ({})".format(unit),
+        "Radial stress ({})".format(unit),
         step=100.0 if unit == "kPa" else 1.0,
         min_value=0.0,
         key="esf1",
-        help="Esfuerzo isotrópico final de la etapa de consolidación.",
+        help="Isotropic stress at the end of consolidation assumed at the center of the specimen.",
     )
     if esf in st.session_state["esf_conf"]:
         file1_check = False
@@ -189,10 +181,10 @@ with st.form("formensayo2"):
 
     with col1:
         h_cons[1] = st.number_input(
-            "Deformación vertical (mm)",
+            "Vertical deformation (mm)",
             min_value=0.0,
             key="h2",
-            help="Deformación final producida en etapa de consolidación.",
+            help="Change in height of specimen at the end of consolidation.",
             format="%.3f",
             step=0.001,
         )
@@ -200,17 +192,17 @@ with st.form("formensayo2"):
     with col2:
 
         v_cons[1] = st.number_input(
-            "Variación volumétrica (cm³)",
+            "Volumetric variation (cm³)",
             min_value=0.0,
             key="v2",
-            help="Volumen total desplazado en la etapa de consolidación.",
+            help="Change in volume of specimen during consolidation as indicated by burette readings.",
         )
     esf = st.number_input(
-        "Esfuerzo de confinamiento ({})".format(unit),
+        "Radial stress ({})".format(unit),
         step=100.0 if unit == "kPa" else 1.0,
         min_value=0.0,
         key="esf2",
-        help="Esfuerzo isotrópico final de la etapa de consolidación.",
+        help="Isotropic stress at the end of consolidation assumed at the center of the specimen.",
     )
     if esf in st.session_state["esf_conf"]:
         file2_check = False
@@ -258,10 +250,10 @@ with st.form("formensayo3"):
 
     with col1:
         h_cons[2] = st.number_input(
-            "Deformación vertical (mm)",
+            "Vertical deformation (mm)",
             min_value=0.0,
             key="h3",
-            help="Deformación final producida en etapa de consolidación.",
+            help="Change in height of specimen at the end of consolidation.",
             format="%.3f",
             step=0.001,
         )
@@ -269,18 +261,18 @@ with st.form("formensayo3"):
     with col2:
 
         v_cons[2] = st.number_input(
-            "Variación volumétrica (cm³)",
+            "Volumetric variation (cm³)",
             min_value=0.0,
             key="v3",
-            help="Volumen total desplazado en la etapa de consolidación.",
+            help="Change in volume of specimen during consolidation as indicated by burette readings.",
         )
 
     esf = st.number_input(
-        "Esfuerzo de confinamiento ({})".format(unit),
+        "Radial stress ({})".format(unit),
         step=100.0 if unit == "kPa" else 1.0,
         min_value=0.0,
         key="esf3",
-        help="Esfuerzo isotrópico final de la etapa de consolidación.",
+        help="Isotropic stress at the end of consolidation assumed at the center of the specimen.",
     )
     if esf in st.session_state["esf_conf"]:
         file3_check = False
@@ -545,7 +537,7 @@ if all(st.session_state.files):
         )
         ensayo["Δσ ({0})".format(unit)] = ensayo["ΔP"] / ensayo["Ac (cm²)"] * 10**4
 
-    _st.googlef_text("🏴 Geometry | Consolidation", key="h3", color="#434C5E")
+    _st.googlef_text("🏴 Geometry | After Consolidation", key="h3", color="#434C5E")
 
     tabla_preprocs = st.selectbox(
         "Seleccione uno de los registros de laboratorio.",
