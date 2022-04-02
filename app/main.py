@@ -305,7 +305,7 @@ else:
 
 if all(st.session_state.files):
 
-    st.success("Todos los registros han sido cargados satisfactoriamente.")
+    st.success("Data records successfully uploaded.")
 
 
 ############################################
@@ -901,7 +901,7 @@ if all(st.session_state.files):
     # Círculos de Mohr #
     ####################
 
-    _st.googlef_text("📉 Mohr Circles", key="h3", color="#434C5E")
+    _st.googlef_text("📉 Mohr's Circles", key="h3", color="#434C5E")
 
     if convencion == "University of Cambridge":
         phi = float(np.degrees(np.arcsin(modelo_MIT.coef_)))
